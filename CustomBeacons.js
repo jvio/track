@@ -15,7 +15,7 @@ export class CustomBeacons extends Component {
     regionDidEnterEvent = null;
     // will be set as a reference to "authorizationStatusDidChange" event:
     authStateDidRangeEvent = null;
-    notification = false;
+    notification = 0;
 
     constructor(props) {
         super(props);
@@ -75,15 +75,6 @@ export class CustomBeacons extends Component {
         const region = { identifier, uuid, major, minor };
         // Range for beacons inside the region
         console.log(region);
-        /*Beacons
-            .startMonitoringForRegion(region) // or like  < v1.0.7: .startRangingBeaconsInRegion(identifier, uuid)
-            .then(() => console.log('Beacons monitoring started successfully'))
-            .catch(error => console.log(`Beacons monitoring not started, error: ${error}`));*/
-        // Range for beacons inside the region
-        Beacons
-            .startRangingBeaconsInRegion(region) // or like  < v1.0.7: .startRangingBeaconsInRegion(identifier, uuid)
-            .then(() => console.log('Beacons ranging started successfully'))
-            .catch(error => console.log(`Beacons ranging not started, error: ${error}`));
 
         // Ranging: Listen for beacon changes
        this.beaconsDidRangeEvent = Beacons.BeaconsEventEmitter.addListener(
@@ -92,20 +83,34 @@ export class CustomBeacons extends Component {
                 //console.log('beaconsDidRange data: ', data);
                 this.setState({ beacons: data.beacons && data.beacons.length ? data.beacons : this.state.beacons });
 
-                if (!this.notification) {
+                this.notification ++;
+                if (this.notification > 10) {
                     PushNotification.localNotification({
                         message: 'test',
                     });
-                    this.notification = true;
+                    this.notification = 0;
                 }
             }
         );
+
+        // Range for beacons inside the region
+        Beacons
+            .startRangingBeaconsInRegion(region) // or like  < v1.0.7: .startRangingBeaconsInRegion(identifier, uuid)
+            .then(() => console.log('Beacons ranging started successfully'))
+            .catch(error => console.log(`Beacons ranging not started, error: ${error}`));
+
         this.regionDidEnterEvent = Beacons.BeaconsEventEmitter.addListener(
             'regionDidEnter',
             (data) => {
                 console.log('regionDidEnter data: ', data);
             }
         );
+
+        Beacons
+            .startMonitoringForRegion(region) // or like  < v1.0.7: .startRangingBeaconsInRegion(identifier, uuid)
+            .then(() => console.log('Beacons monitoring started successfully'))
+            .catch(error => console.log(`Beacons monitoring not started, error: ${error}`));
+
         /*this.beaconsDidRangeEvent = DeviceEventEmitter.addListener(
              'beaconsDidRange',
              (data) => {
@@ -134,6 +139,11 @@ export class CustomBeacons extends Component {
              .stopRangingBeaconsInRegion(region)
              .then(() => console.log('Beacons ranging stopped successfully'))
              .catch(error => console.log(`Beacons ranging not stopped, error: ${error}`));
+         // stop ranging beacons:
+         Beacons
+             .stopMonitoringForRegion(region)
+             .then(() => console.log('Beacons monitoring stopped successfully'))
+             .catch(error => console.log(`Beacons monitoring not stopped, error: ${error}`));
         // remove auth state event we registered at componentDidMount:
         this.authStateDidRangeEvent.remove();
         // remove ranging event we registered at componentDidMount:
