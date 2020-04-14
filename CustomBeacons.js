@@ -135,20 +135,20 @@ export class CustomBeacons extends Component {
          const { identifier, uuid } = this.state;
          const region = { identifier, uuid };
          // stop ranging beacons:
-         Beacons
+         /*Beacons
              .stopRangingBeaconsInRegion(region)
              .then(() => console.log('Beacons ranging stopped successfully'))
-             .catch(error => console.log(`Beacons ranging not stopped, error: ${error}`));
+             .catch(error => console.log(`Beacons ranging not stopped, error: ${error}`));*/
          // stop ranging beacons:
-         Beacons
+         /*Beacons
              .stopMonitoringForRegion(region)
              .then(() => console.log('Beacons monitoring stopped successfully'))
-             .catch(error => console.log(`Beacons monitoring not stopped, error: ${error}`));
+             .catch(error => console.log(`Beacons monitoring not stopped, error: ${error}`));*/
         // remove auth state event we registered at componentDidMount:
-        this.authStateDidRangeEvent.remove();
+        //this.authStateDidRangeEvent.remove();
         // remove ranging event we registered at componentDidMount:
-        this.beaconsDidRangeEvent.remove();
-        this.regionDidEnterEvent.remove();
+        //this.beaconsDidRangeEvent.remove();
+        //this.regionDidEnterEvent.remove();
     }
 
     renderRangingRow(rowData) {
