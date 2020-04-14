@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import Beacons  from 'react-native-beacons-manager';
 import BluetoothState from 'react-native-bluetooth-state';
+import PushNotification from 'react-native-push-notification';
 
 export class CustomBeacons extends Component {
     // will be set as a reference to "beaconsDidRange" event:
@@ -14,6 +15,7 @@ export class CustomBeacons extends Component {
     regionDidEnterEvent = null;
     // will be set as a reference to "authorizationStatusDidChange" event:
     authStateDidRangeEvent = null;
+    notification = false;
 
     constructor(props) {
         super(props);
@@ -43,6 +45,14 @@ export class CustomBeacons extends Component {
 
         // Request for authorization always
         Beacons.requestAlwaysAuthorization();
+
+        PushNotification.checkPermissions(() => {});
+
+        PushNotification.configure({
+            onNotification: notification => {
+                console.log( 'NOTIFICATION:', notification );
+            },
+        });
     }
 
     componentDidMount() {
@@ -65,10 +75,10 @@ export class CustomBeacons extends Component {
         const region = { identifier, uuid, major, minor };
         // Range for beacons inside the region
         console.log(region);
-        Beacons
+        /*Beacons
             .startMonitoringForRegion(region) // or like  < v1.0.7: .startRangingBeaconsInRegion(identifier, uuid)
             .then(() => console.log('Beacons monitoring started successfully'))
-            .catch(error => console.log(`Beacons monitoring not started, error: ${error}`));
+            .catch(error => console.log(`Beacons monitoring not started, error: ${error}`));*/
         // Range for beacons inside the region
         Beacons
             .startRangingBeaconsInRegion(region) // or like  < v1.0.7: .startRangingBeaconsInRegion(identifier, uuid)
@@ -79,8 +89,15 @@ export class CustomBeacons extends Component {
        this.beaconsDidRangeEvent = Beacons.BeaconsEventEmitter.addListener(
             'beaconsDidRange',
             (data) => {
-                console.log('beaconsDidRange data: ', data);
+                //console.log('beaconsDidRange data: ', data);
                 this.setState({ beacons: data.beacons && data.beacons.length ? data.beacons : this.state.beacons });
+
+                if (!this.notification) {
+                    PushNotification.localNotification({
+                        message: 'test',
+                    });
+                    this.notification = true;
+                }
             }
         );
         this.regionDidEnterEvent = Beacons.BeaconsEventEmitter.addListener(
@@ -103,6 +120,10 @@ export class CustomBeacons extends Component {
              }
          );
          */
+
+        /*PushNotification.addEventListener('localNotification', notification => {
+            console.log('You have received a new notification!', notification);
+        });*/
      }
 
      componentWillUnmount() {
