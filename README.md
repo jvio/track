@@ -2,7 +2,7 @@
 
 Example using iBeacon for Tracking.
 
-![logo](./IMG_0085.png)
+![img](IMG_0085.png)
 
 ## Quick start
 
