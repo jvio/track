@@ -38,13 +38,13 @@
 		</dict>
 	</dict>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Location is needed to know where you are at MSK.</string>
+	<string>Location is needed to know where you are at.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Location is needed to know where you are at MSK.</string>
+	<string>Location is needed to know where you are at.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Location is needed to know where you are at MSK.</string>
+	<string>Location is needed to know where you are at.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Location is needed to know where you are at MSK.</string>
+	<string>Location is needed to know where you are at.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>bluetooth-central</string>
