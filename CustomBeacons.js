@@ -5,9 +5,9 @@ import {
     StyleSheet,
     DeviceEventEmitter
 } from 'react-native';
-import Beacons  from 'react-native-beacons-manager';
+import Beacons from 'react-native-beacons-manager';
 import PushNotification from 'react-native-push-notification';
-import {Colors} from "react-native/Libraries/NewAppScreen";
+import { Colors } from "react-native/Libraries/NewAppScreen";
 
 export class CustomBeacons extends Component {
     // will be set as a reference to "beaconsDidRange" event:
@@ -37,11 +37,12 @@ export class CustomBeacons extends Component {
 
         const { identifier, uuid, major, minor } = this.state;
 
-        PushNotification.checkPermissions(() => {});
+        PushNotification.checkPermissions(() => {
+        });
 
         PushNotification.configure({
             onNotification: notification => {
-                console.log( 'NOTIFICATION:', notification );
+                console.log('NOTIFICATION:', notification);
             },
         });
 
@@ -66,12 +67,12 @@ export class CustomBeacons extends Component {
         // Define a region which can be identifier + uuid,
         // identifier + uuid + major or identifier + uuid + major + minor
         // (minor and major properties are numbers)
-        const region = { identifier, uuid, major, minor };
+        const region = {identifier, uuid, major, minor};
         // Range for beacons inside the region
         console.log(region);
 
         // Ranging: Listen for beacon changes
-       this.beaconsDidRangeEvent = Beacons.BeaconsEventEmitter.addListener(
+        this.beaconsDidRangeEvent = Beacons.BeaconsEventEmitter.addListener(
             'beaconsDidRange',
             (data) => {
                 //console.log('beaconsDidRange data: ', data);
@@ -119,21 +120,21 @@ export class CustomBeacons extends Component {
         /*PushNotification.addEventListener('localNotification', notification => {
             console.log('You have received a new notification!', notification);
         });*/
-     }
+    }
 
-     componentWillUnmount() {
-         const { identifier, uuid } = this.state;
-         const region = { identifier, uuid };
-         // stop ranging beacons:
-         Beacons
-             .stopRangingBeaconsInRegion(region)
-             .then(() => console.log('Beacons ranging stopped successfully'))
-             .catch(error => console.log(`Beacons ranging not stopped, error: ${error}`));
-         // stop ranging beacons:
-         Beacons
-             .stopMonitoringForRegion(region)
-             .then(() => console.log('Beacons monitoring stopped successfully'))
-             .catch(error => console.log(`Beacons monitoring not stopped, error: ${error}`));
+    componentWillUnmount() {
+        const { identifier, uuid } = this.state;
+        const region = { identifier, uuid };
+        // stop ranging beacons:
+        Beacons
+            .stopRangingBeaconsInRegion(region)
+            .then(() => console.log('Beacons ranging stopped successfully'))
+            .catch(error => console.log(`Beacons ranging not stopped, error: ${error}`));
+        // stop ranging beacons:
+        Beacons
+            .stopMonitoringForRegion(region)
+            .then(() => console.log('Beacons monitoring stopped successfully'))
+            .catch(error => console.log(`Beacons monitoring not stopped, error: ${error}`));
         // remove auth state event we registered at componentDidMount:
         this.authStateDidRangeEvent.remove();
         // remove ranging event we registered at componentDidMount:
@@ -141,9 +142,9 @@ export class CustomBeacons extends Component {
         this.regionDidEnterEvent.remove();
     }
 
-    renderRow(rowData) {
+    renderRow(rowData, index) {
         return (
-            <View style={styles.sectionCode}>
+            <View style={styles.sectionCode} key={index}>
                 <Text style={styles.sectionLineCode}>
                     UUID: {rowData.uuid ? rowData.uuid  : 'NA'}
                 </Text>
@@ -169,16 +170,15 @@ export class CustomBeacons extends Component {
     render() {
         const { beacons } =  this.state;
         let rows = []
-        for(let i = 0; i < beacons.length; i++){
-            let rowData = beacons[i];
-            rows.push(this.renderRow(rowData));
+        for (let i = 0; i < beacons.length; i++) {
+            rows.push(this.renderRow(beacons[i], i));
         }
 
         return (
             <View>
                 <Text style={styles.sectionTitle}>Beacons in the Area</Text>
                 <View style={styles.sectionDescription}>
-                    {rows.length? rows : <Text style={styles.sectionDescription}>No Beacons</Text>}
+                    {rows.length ? rows : <Text style={styles.sectionDescription}>No Beacons</Text>}
                 </View>
             </View>
         );
