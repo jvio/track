@@ -13,7 +13,7 @@ import {
   ScrollView,
   View,
   Text,
-  StatusBar,
+  StatusBar
 } from 'react-native';
 
 import {
@@ -39,8 +39,14 @@ const App: () => React$Node = () => {
               <Text style={styles.footer}>Engine: Hermes</Text>
             </View>
           )}
-          <CustomBeacons/>
           <View style={styles.body}>
+            <View style={styles.sectionContainer}>
+              <CustomBeacons/>
+            </View>
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>React Native Information</Text>
+              <Text>------------------------------------------</Text>
+            </View>
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Step One</Text>
               <Text style={styles.sectionDescription}>

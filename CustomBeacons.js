@@ -6,8 +6,8 @@ import {
     DeviceEventEmitter
 } from 'react-native';
 import Beacons  from 'react-native-beacons-manager';
-import BluetoothState from 'react-native-bluetooth-state';
 import PushNotification from 'react-native-push-notification';
+import {Colors} from "react-native/Libraries/NewAppScreen";
 
 export class CustomBeacons extends Component {
     // will be set as a reference to "beaconsDidRange" event:
@@ -31,6 +31,24 @@ export class CustomBeacons extends Component {
             //uuid: '90B1E953-D1FE-3DC0-1046-BA0198057B88',
             beacons: []
         };
+    }
+
+    componentDidMount() {
+
+        const { identifier, uuid, major, minor } = this.state;
+
+        PushNotification.checkPermissions(() => {});
+
+        PushNotification.configure({
+            onNotification: notification => {
+                console.log( 'NOTIFICATION:', notification );
+            },
+        });
+
+        // MANDATORY: Request for authorization while the app is open
+        //           -> this is the authorization set by default by react-native init in the info.plist file
+        // RANGING ONLY (this is not enough to make MONITORING working)
+        //Beacons.requestWhenInUseAuthorization();
 
         // OPTIONAL: listen to authorization change
         this.authStateDidRangeEvent = Beacons.BeaconsEventEmitter.addListener(
@@ -40,35 +58,11 @@ export class CustomBeacons extends Component {
         /*this.authStateDidRangeEvent = DeviceEventEmitter.addListener(
             'authorizationStatusDidChange',
             (info) => console.log('authorizationStatusDidChange: ', info)
-        );
-        */
+        );*/
 
         // Request for authorization always
         Beacons.requestAlwaysAuthorization();
 
-        PushNotification.checkPermissions(() => {});
-
-        PushNotification.configure({
-            onNotification: notification => {
-                console.log( 'NOTIFICATION:', notification );
-            },
-        });
-    }
-
-    componentDidMount() {
-        //
-        // component state aware here - attach events
-        //
-
-        const { identifier, uuid, major, minor } = this.state;
-        //
-        // ONLY non component state aware here in componentWillMount
-        //
-
-        // MANDATORY: Request for authorization while the app is open
-        //           -> this is the authorization set by default by react-native init in the info.plist file
-        // RANGING ONLY (this is not enough to make MONITORING working)
-        //Beacons.requestWhenInUseAuthorization();
         // Define a region which can be identifier + uuid,
         // identifier + uuid + major or identifier + uuid + major + minor
         // (minor and major properties are numbers)
@@ -82,14 +76,6 @@ export class CustomBeacons extends Component {
             (data) => {
                 //console.log('beaconsDidRange data: ', data);
                 this.setState({ beacons: data.beacons && data.beacons.length ? data.beacons : this.state.beacons });
-
-                this.notification ++;
-                if (this.notification > 10) {
-                    PushNotification.localNotification({
-                        message: 'test',
-                    });
-                    this.notification = 0;
-                }
             }
         );
 
@@ -103,6 +89,9 @@ export class CustomBeacons extends Component {
             'regionDidEnter',
             (data) => {
                 console.log('regionDidEnter data: ', data);
+                PushNotification.localNotification({
+                    message: 'Entered Region',
+                });
             }
         );
 
@@ -111,6 +100,7 @@ export class CustomBeacons extends Component {
             .then(() => console.log('Beacons monitoring started successfully'))
             .catch(error => console.log(`Beacons monitoring not started, error: ${error}`));
 
+        // deprecated
         /*this.beaconsDidRangeEvent = DeviceEventEmitter.addListener(
              'beaconsDidRange',
              (data) => {
@@ -123,9 +113,9 @@ export class CustomBeacons extends Component {
              (data) => {
                  console.log('regionDidEnter data: ', data);
              }
-         );
-         */
+         );*/
 
+        // deprecated
         /*PushNotification.addEventListener('localNotification', notification => {
             console.log('You have received a new notification!', notification);
         });*/
@@ -151,25 +141,25 @@ export class CustomBeacons extends Component {
         this.regionDidEnterEvent.remove();
     }
 
-    renderRangingRow(rowData) {
+    renderRow(rowData) {
         return (
-            <View >
-                <Text >
+            <View style={styles.sectionCode}>
+                <Text style={styles.sectionLineCode}>
                     UUID: {rowData.uuid ? rowData.uuid  : 'NA'}
                 </Text>
-                <Text >
+                <Text style={styles.sectionLineCode}>
                     Major: {rowData.major ? rowData.major : 'NA'}
                 </Text>
-                <Text >
+                <Text style={styles.sectionLineCode}>
                     Minor: {rowData.minor ? rowData.minor : 'NA'}
                 </Text>
-                <Text>
+                <Text style={styles.sectionLineCode}>
                     RSSI: {rowData.rssi ? rowData.rssi : 'NA'}
                 </Text>
-                <Text>
+                <Text style={styles.sectionLineCode}>
                     Proximity: {rowData.proximity ? rowData.proximity : 'NA'}
                 </Text>
-                <Text>
+                <Text style={styles.sectionLineCode}>
                     Distance: {rowData.accuracy ? rowData.accuracy.toFixed(2) : 'NA'}m
                 </Text>
             </View>
@@ -181,19 +171,40 @@ export class CustomBeacons extends Component {
         let rows = []
         for(let i = 0; i < beacons.length; i++){
             let rowData = beacons[i];
-            rows.push(this.renderRangingRow(rowData));
+            rows.push(this.renderRow(rowData));
         }
 
         return (
-            <View >
-                <Text>
-                    All beacons in the area
-                </Text>
-                {rows}
+            <View>
+                <Text style={styles.sectionTitle}>Beacons in the Area</Text>
+                <View style={styles.sectionDescription}>
+                    {rows.length? rows : <Text style={styles.sectionDescription}>No Beacons</Text>}
+                </View>
             </View>
         );
     }
 }
 
 const styles = StyleSheet.create({
+    sectionTitle: {
+        fontSize: 24,
+        fontWeight: '600',
+        color: Colors.black,
+    },
+    sectionDescription: {
+        marginTop: 8,
+        fontSize: 18,
+        fontWeight: '400',
+        color: Colors.dark,
+    },
+    sectionCode: {
+        fontSize: 18,
+        padding: 10,
+        color: Colors.dark,
+        backgroundColor: Colors.light
+    },
+    sectionLineCode: {
+        fontSize: 12,
+        marginTop: 7,
+    },
 });
